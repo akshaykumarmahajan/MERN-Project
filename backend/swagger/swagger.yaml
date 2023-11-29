@@ -1,0 +1,158 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: API Integration
+# during dev, should point to your local machine
+host: localhost:8000
+# basePath prefixes all resource paths
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /api/user/register:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: userController
+    post:
+      tags: ["User Module"]
+      description: User Sign Up
+      summary: User Sign Up
+      # used as the method name of the controller
+      operationId: register
+      parameters:
+        - name: body
+          in: body
+          description: User Sign Up
+          schema:
+            $ref: "#/definitions/register"
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/appResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /api/user/login:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: userController
+    post:
+      tags: ["User Module"]
+      description: User Sign In
+      summary: User Sign In
+      # used as the method name of the controller
+      operationId: login
+      parameters:
+        - name: body
+          in: body
+          description: User Sign In
+          schema:
+            $ref: "#/definitions/login"
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/appResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /api/forgotPassword:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: auth_ctrl
+    post:
+      tags: ["Auth Module"]
+      description: Forgot Password
+      summary: Forgot Password
+      # used as the method name of the controller
+      operationId: forgotPassword
+      parameters:
+        - name: body
+          in: body
+          description: Forgot Password
+          schema:
+            $ref: "#/definitions/forgotPassword"
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/appResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  register:
+    type: object
+    properties:
+      firstname:
+        type: string
+      lastname:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      confirm_password:
+        type: string
+  login:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+  forgotPassword:
+    type: object
+    properties:
+      email:
+        type: string
+      userType:
+        type: string
+  ResetPassword:
+    type: object
+    properties:
+      temp_password:
+        type: string
+      password:
+        type: string
+  userLogOut:
+    type: object
+    properties:
+      userId:
+        type: string
+  appResponse:
+    required:
+      - code
+    properties:
+      code:
+        type: number
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
