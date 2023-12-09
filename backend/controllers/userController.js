@@ -1,19 +1,29 @@
 const userService = require("../services/userService");
+const {STATUS}= require('../lib/constants')  
 
-exports.userRegister = async (req, res) => {
+exports.getUserDetail = async (req, res) => {
   try {
-    await userService.userRegister(req, res);
+    await userService.getUserDetail(req, res);
   } catch (error) {
     res.status(500);
-    res.send({ status: "failed", message: err.message });
+    res.send({ status: STATUS.failed, message: err.message });
   }
 };
 
-exports.userLogin = async (req, res) => {
+exports.updateUserDetail = async (req, res) => {
   try {
-    await userService.userLogin(req, res);
+    await userService.updateUserDetail(req, res);
   } catch (error) {
     res.status(500);
-    res.send({ status: "failed", message: err.message });
+    res.send({ status: STATUS.failed, message: err.message });
+  }
+};
+
+exports.changeUserPassword = async (req, res) => {
+  try {
+    await userService.changeUserPassword(req, res);
+  } catch (error) {
+    res.status(500);
+    res.send({ status: STATUS.failed, message: err.message });
   }
 };

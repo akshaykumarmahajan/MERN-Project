@@ -1,85 +1,92 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const config = require("../config/config");
+const {STATUS, MESSAGE}= require('../lib/constants')  
 
-const userRegister = async (req, res) => {
-  if (!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password || !req.body.confirm_password) {
-    res.status(401).send({ status: "failed", message: "All fields are required." });
+const getUserDetail = async (req, res) => {
+  if (!req.user._id) {
+    res.status(401).send({ status: STATUS.failed, message: MESSAGE.userNotFound });
   } else {
     try {
-      const { firstname, lastname, email, password, confirm_password } = req.body;
-      const checkEmail = await User.findOne({ email: email });
-      if (checkEmail) {
-        res.status(401).send({ status: "failed", message: "Email already exisit." });
+      const user = await User.findOne({ _id: req.user._id }, { password: 0 });
+      if (user) {
+        res.status(201).send({status: STATUS.success, message: MESSAGE.dataRetrievedSuccess, data: user});
       } else {
-        if (password === confirm_password) {
-          try {
-            const salt = await bcrypt.genSalt(10);
-            const hashPassword = await bcrypt.hash(password, salt);
-            const userObj = {
-              firstname: firstname,
-              lastname: lastname,
-              email: email,
-              password: hashPassword,
-              username: firstname + lastname,
-            };
-            if (req.body.role === "Admin") {
-              userObj.role = req.body.role;
-            }
-            console.log("userObh", userObj);
-            const addUser = await User.create(userObj);
-            if (addUser) {
-              res.status(201).send({status: "success",message: "Registration successfully."});
-            } else {
-              res.status(404).send({ status: "failed", message: "Unable to register." });
-            }
-          } catch (error) {
-            res.status(404).send({ status: "failed", message: "Unable to register." });
-          }
-        } else {
-          res.status(401).send({status: "failed",message: "Password and confirm password doesn't match."});
-        }
+        res.status(401).send({ status: STATUS.failed, message: MESSAGE.userNotFound });
       }
     } catch (error) {
-      res.status(404).send({status: "failed",message: "Something went wrong.",error: error});
+      res.status(404).send({status: STATUS.failed,message: MESSAGE.unableToGetUser, error: error,});
     }
   }
 };
 
-const userLogin = async (req, res) => {
-  console.log("req",req.body)
-  if (!req.body.email || !req.body.password) {
-    res.status(401).send({ status: "failed", message: "All fields are required." });
+const updateUserDetail = async (req, res) => {
+  if (!req.body.firstname || !req.body.lastname) {
+    res.status(401).send({ status: STATUS.failed, message: MESSAGE.requiredFieldsMissing});
   } else {
     try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ email: email });
-      if (user != null) {
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (user.email === email && isMatch) {
-          const token = jwt.sign({ userID: user._id },process.env.JWT_SECRET_KEY,{ expiresIn: "5d" });
-          const data ={
-            _id: user._id,
-            firstname:user.firstname,
-            lastname:user.lastname,
-            email:user.email,
-            token:token
-          }
-          res.status(201).send({status: "success",message: "Login Successfully.",data: data,});
-        } else {
-          res.status(401).send({status: "failed",message: "Invalid Credentials."});
-        }
+      const {firstname, lastname, phone_number, gender, dob, address, country, state, city } = req.body;
+
+      const updateUser = await User.findByIdAndUpdate(
+        { _id: req.user._id },
+        {
+          $set: {
+            firstname: firstname,
+            lastname: lastname,
+            phone_number: phone_number,
+            gender: gender,
+            dob: dob,
+            address: address,
+            country: country,
+            state: state,
+            city: city,
+          },
+        },
+        { new: true }
+      );
+
+      if (updateUser) {
+        res.status(201).send({status: STATUS.success, message: MESSAGE.profileUpdatedSuccess, data: updateUser});
       } else {
-        res.status(401).send({status: "failed",message: "You are not a registered user."});
+        res.status(404).send({ status: STATUS.failed, message: MESSAGE.unableUserUpdated });
       }
     } catch (error) {
-      res.status(404).send({status: "failed",message: "Unable to login.",error: error});
+      res.status(404).send({status: STATUS.failed, message: MESSAGE.somethingWentWrong, error: error});
+    }
+  }
+};
+
+const changeUserPassword = async (req, res) => {
+  if (!req.body.current_password || !req.body.new_password || !req.body.confirm_password) {
+    res.status(401).send({ status: STATUS.failed, message: MESSAGE.requiredFieldsMissing });
+  } else {
+    try {
+      const { current_password, new_password, confirm_password } = req.body;
+      if (new_password !== confirm_password) {
+        res.status(401).send({ status: STATUS.failed, message: MESSAGE.newpassandconfirmpass});
+      } else {
+        const user = await User.findById(req.user._id).select("+password");
+        const userVerified = await bcrypt.compare(current_password,user.password );
+        if (!user || !userVerified) {
+          res.status(401).send({status: STATUS.failed, message: MESSAGE.userInvalidCurrPass });
+        } else {
+          const salt = await bcrypt.genSalt(10);
+          const newHashPassword = await bcrypt.hash(new_password, salt);
+          const updatePass = await User.findByIdAndUpdate(req.user._id, { $set: { password: newHashPassword }});
+          if (updatePass) {
+            res.status(201).send({status: STATUS.success, message: MESSAGE.passwordChangedSuccess});
+          } else {
+            res.status(404).send({status: STATUS.failed, message: MESSAGE.unablePasswordUpdated});
+          }
+        }
+      }
+    } catch (error) {
+      res.status(404).send({status: STATUS.failed, message: MESSAGE.unableToGetUser, error: error});
     }
   }
 };
 
 module.exports = {
-  userRegister,
-  userLogin,
+  getUserDetail,
+  updateUserDetail,
+  changeUserPassword,
 };
