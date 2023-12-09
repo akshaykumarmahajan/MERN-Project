@@ -17,12 +17,19 @@ consumes:
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: >-
+      Enter the token with the `Bearer: ` prefix, e.g. "Bearer abcde12345". 
 paths:
-  /api/user/register:
+  /api/auth/register:
     # binds a127 app logic to a route
-    x-swagger-router-controller: userController
+    x-swagger-router-controller: authController
     post:
-      tags: ["User Module"]
+      tags: ["Auth Module"]
       description: User Sign Up
       summary: User Sign Up
       # used as the method name of the controller
@@ -45,11 +52,11 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /api/user/login:
+  /api/auth/login:
     # binds a127 app logic to a route
-    x-swagger-router-controller: userController
+    x-swagger-router-controller: authController
     post:
-      tags: ["User Module"]
+      tags: ["Auth Module"]
       description: User Sign In
       summary: User Sign In
       # used as the method name of the controller
@@ -72,21 +79,45 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /api/forgotPassword:
+  /api/user/getUserDetail:
     # binds a127 app logic to a route
-    x-swagger-router-controller: auth_ctrl
-    post:
-      tags: ["Auth Module"]
-      description: Forgot Password
-      summary: Forgot Password
+    x-swagger-router-controller: userController
+    get:
+      security:
+        - Bearer: []
+      tags: ["User Module"]
+      description: Get User Detail
+      summary: Get User Detail
       # used as the method name of the controller
-      operationId: forgotPassword
+      operationId: getUserDetail
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/appResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /api/user/updateUserDetail:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: userController
+    post:
+      security:
+        - Bearer: []    
+      tags: ["User Module"]
+      description: Update User Detail
+      summary: Update User Detail
+      # used as the method name of the controller
+      operationId: updateUserDetail
       parameters:
         - name: body
           in: body
-          description: Forgot Password
+          description: Update User Detail
           schema:
-            $ref: "#/definitions/forgotPassword"
+            $ref: "#/definitions/updateUserDetail"
           required: true
       responses:
         "200":
@@ -99,6 +130,35 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /api/user/changeUserPassword:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: userController
+    post:
+      security:
+        - Bearer: []    
+      tags: ["User Module"]
+      description: Change User Password
+      summary: Change User Password
+      # used as the method name of the controller
+      operationId: changeUserPassword
+      parameters:
+        - name: body
+          in: body
+          description: Change User Password
+          schema:
+            $ref: "#/definitions/changeUserPassword"
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/appResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"                                                
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -123,25 +183,36 @@ definitions:
         type: string
       password:
         type: string
-  forgotPassword:
+  updateUserDetail:
     type: object
     properties:
-      email:
+      firstname:
         type: string
-      userType:
+      lastname:
         type: string
-  ResetPassword:
+      phone_number:
+        type: string
+      dob:
+        type: string
+      gender:
+        type: string
+      address:
+        type: string  
+      country:
+        type: string  
+      state:
+        type: string  
+      city:
+        type: string
+  changeUserPassword:
     type: object
     properties:
-      temp_password:
+      current_password:
         type: string
-      password:
+      new_password:
         type: string
-  userLogOut:
-    type: object
-    properties:
-      userId:
-        type: string
+      confirm_password:
+        type: string                                                         
   appResponse:
     required:
       - code
