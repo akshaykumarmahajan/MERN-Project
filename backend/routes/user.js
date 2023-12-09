@@ -39,6 +39,6 @@ router.use("/updateProfileImage", checkUserAuth);
 router.get("/getUserDetail", UserController.getUserDetail);
 router.post("/updateUserDetail", UserController.updateUserDetail);
 router.post("/changeUserPassword", UserController.changeUserPassword);
-router.post("/updateProfileImage", upload.single('profile_image'), UserController.updateProfileImage);
+router.put("/updateProfileImage", upload.single('profile_image'), UserController.updateProfileImage);
 
 module.exports = router;

@@ -158,7 +158,37 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"                                                
+            $ref: "#/definitions/ErrorResponse"
+  /api/user/updateProfileImage:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: userController
+    put:
+      security:
+        - Bearer: []    
+      tags: ["User Module"]
+      description: Update User Profile Image
+      summary: Update User Profile Image
+      # used as the method name of the controller
+      operationId: updateProfileImage
+      parameters:
+        - name: profile_image
+          in: formData
+          description: Update User Profile Image
+          type: file
+          schema:
+            $ref: "#/definitions/updateProfileImage"
+          required: true          
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/appResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"                                                            
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -212,7 +242,12 @@ definitions:
       new_password:
         type: string
       confirm_password:
-        type: string                                                         
+        type: string
+  updateProfileImage:
+    type: object
+    properties:
+      profile_image:
+        type: string
   appResponse:
     required:
       - code
