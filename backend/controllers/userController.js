@@ -27,3 +27,14 @@ exports.changeUserPassword = async (req, res) => {
     res.send({ status: STATUS.failed, message: err.message });
   }
 };
+
+exports.updateProfileImage = async (req, res) => {
+  console.log('req',req)
+  try {
+    await userService.updateProfileImage(req, res);
+  } catch (error) {
+    res.status(500);
+    res.send({ status: STATUS.failed, message: err.message });
+  }
+};
+

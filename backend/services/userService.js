@@ -85,8 +85,30 @@ const changeUserPassword = async (req, res) => {
   }
 };
 
+const updateProfileImage = async (req, res) => {
+  if (!req.file) {
+    res.status(401).send({ status: STATUS.failed, message: MESSAGE.imageRequired });
+  } else {
+    try {
+      const imageUpdate = await User.findByIdAndUpdate(
+        req.user._id,
+        { $set: { profile_image: req.file.filename } },
+        {new: true}
+      );
+      if (imageUpdate) {
+        res.status(201).send({status: STATUS.success,message: MESSAGE.imageUpdateSuccess });
+      } else {
+        res.status(404).send({ status: STATUS.failed,  message: MESSAGE.unableImageUpdated });
+      }
+    } catch (error) {
+      res.status(404).send({ status: STATUS.failed, message: MESSAGE.somethingWentWrong,error: error });
+    }
+  }
+};
+
 module.exports = {
   getUserDetail,
   updateUserDetail,
   changeUserPassword,
+  updateProfileImage
 };
