@@ -17,10 +17,9 @@ const userSchema = new mongoose.Schema({
     gender:                         {type: String, default: ''},
     dob:                            {type: Date,   default: '' },    
     joinDate:                       {type: Date,   default: Date.now },
-    status:                         {type: String, default: 1},       //0-InActive, 1-Active, 2- Deactive
+    status:                         {type: String, default: 0},       //0-InActive, 1-Active, 2- Deactive
     deleted:                        {type: Boolean, default: false},
-    userType:                       {type: String, enum: ['User', 'Admin'], default: 'User'},
-    is_email_verified:              {type: Boolean, default: true},
+    userType:                       {type: String, enum: ['User', 'Admin'], default: 'User'}
 
 }, {
     timestamps: true

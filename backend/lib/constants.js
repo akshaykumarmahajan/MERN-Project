@@ -5,7 +5,8 @@ const STATUS = {
 
 const MESSAGE = {
     "loginSuccess"                  : "Logged in successfully",
-    "signupSuccess"                 : "Signup successfully, please check you email to activate your account",
+    "signupSuccess"                 : "Signup successfully, please check your email to activate your account",
+    "resetMailSuccess"              : "Mail sent successfully, please check your email to reset your password",
     "passandconfirmpass"            : "Password and confirm password doesn't match",
     "newpassandconfirmpass"         : "New Password and confirm password doesn't match",
     "dataRetrievedSuccess"          : "Data retrieved successfully",
@@ -31,9 +32,24 @@ const MESSAGE = {
     "unauthorizedUserNoToken"       : "Unauthorized user, no token",
     "somethingWentWrong"            : "Something went wrong"
 }
+const MAILSUBJECT = {
+    welcomeEmail: 'Welcome Email',
+    resetEmail: 'Reset Password'
+}
+
+const HOSTNAME = 'http://localhost:8000';
+const USERACTIVATEURL = 'api/auth/userActicate'
+const RESETPASSWORDURL = 'api/auth/userResetPassword'
+const FEHOSTNAME = 'http://localhost:5173'
+
 
 
 module.exports = {
     STATUS: STATUS,
-    MESSAGE: MESSAGE
+    MESSAGE: MESSAGE,
+    MAILSUBJECT:MAILSUBJECT,
+    HOSTNAME: HOSTNAME,
+    USERACTIVATEURL: USERACTIVATEURL,
+    RESETPASSWORDURL:RESETPASSWORDURL,
+    FEHOSTNAME:FEHOSTNAME
 }

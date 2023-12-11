@@ -15,7 +15,7 @@ exports.updateUserDetail = async (req, res) => {
     await userService.updateUserDetail(req, res);
   } catch (error) {
     res.status(500);
-    res.send({ status: STATUS.failed, message: err.message });
+    res.send({ status: STATUS.failed, message: error.message });
   }
 };
 
@@ -24,17 +24,16 @@ exports.changeUserPassword = async (req, res) => {
     await userService.changeUserPassword(req, res);
   } catch (error) {
     res.status(500);
-    res.send({ status: STATUS.failed, message: err.message });
+    res.send({ status: STATUS.failed, message: error.message });
   }
 };
 
 exports.updateProfileImage = async (req, res) => {
-  console.log('req',req)
   try {
     await userService.updateProfileImage(req, res);
   } catch (error) {
     res.status(500);
-    res.send({ status: STATUS.failed, message: err.message });
+    res.send({ status: STATUS.failed, message: error.message });
   }
 };
 
